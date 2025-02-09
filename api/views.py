@@ -1,8 +1,7 @@
-from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from .utils import is_prime, is_perfect, get_properties, get_digit_sum, get_fun_fact
+from .serializers import NumberClassificationSerializer
 
 # Create your views here.
 
@@ -26,17 +25,9 @@ def classify_number(request):
                 "message": "Invalid number format"
             }, status=status.HTTP_400_BAD_REQUEST)
         
-        # Get all properties
-        response_data = {
-            "number": number,
-            "is_prime": is_prime(number),
-            "is_perfect": is_perfect(number),
-            "properties": get_properties(number),
-            "digit_sum": get_digit_sum(number),
-            "fun_fact": get_fun_fact(number)
-        }
-        
-        return Response(response_data, status=status.HTTP_200_OK)
+        # Use serializer to process the number
+        serializer = NumberClassificationSerializer(number)
+        return Response(serializer.data, status=status.HTTP_200_OK)
         
     except Exception as e:
         return Response({
