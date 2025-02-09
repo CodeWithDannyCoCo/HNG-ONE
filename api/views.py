@@ -13,8 +13,8 @@ def classify_number(request):
     # Handle missing number parameter
     if not number:
         return Response({
-            "error": True,
-            "message": "Please provide a number parameter"
+            "number": None,
+            "error": True
         }, status=status.HTTP_400_BAD_REQUEST)
     
     # Try to convert to integer
@@ -22,8 +22,8 @@ def classify_number(request):
         number = int(number)
     except (ValueError, TypeError):
         return Response({
-            "error": True,
-            "message": "Invalid number format"
+            "number": number,
+            "error": True
         }, status=status.HTTP_400_BAD_REQUEST)
     
     try:
@@ -33,6 +33,6 @@ def classify_number(request):
     except Exception as e:
         # Log the error here if you have logging configured
         return Response({
-            "error": True,
-            "message": "Internal server error"
+            "number": None,
+            "error": True
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -64,11 +64,18 @@ class NumberClassificationSerializer(serializers.Serializer):
             return fun_fact
         
         try:
+            # Explicitly using math type as specified
             response = requests.get(
-                f"http://numbersapi.com/{number}/math",
-                timeout=0.5  # Reduced timeout to 500ms
+                f"http://numbersapi.com/{number}/math?json",  # Added json for consistent formatting
+                timeout=0.5
             )
-            fun_fact = response.text if response.status_code == 200 else f"{number} is a number"
+            if response.status_code == 200:
+                try:
+                    fun_fact = response.json()['text']
+                except:
+                    fun_fact = response.text
+            else:
+                fun_fact = f"{number} is a number"
             # Cache for 24 hours
             cache.set(cache_key, fun_fact, 60 * 60 * 24)
             return fun_fact
@@ -79,14 +86,29 @@ class NumberClassificationSerializer(serializers.Serializer):
         try:
             number = int(instance)
             
-            # Basic properties (very fast)
-            properties = ['odd' if number % 2 else 'even']
+            # Initialize properties list
+            properties = []
+            
+            # Check Armstrong first
+            is_armstrong = calculate_armstrong(number)
+            
+            # Check odd/even
+            is_odd = bool(number % 2)
+            
+            # Set properties according to specified combinations
+            if is_armstrong:
+                if is_odd:
+                    properties = ["armstrong", "odd"]
+                else:
+                    properties = ["armstrong", "even"]
+            else:
+                if is_odd:
+                    properties = ["odd"]
+                else:
+                    properties = ["even"]
+            
+            # Calculate other properties
             digit_sum = sum(int(digit) for digit in str(number))
-            
-            # Cached/optimized calculations
-            if calculate_armstrong(number):
-                properties.append('armstrong')
-            
             is_prime = calculate_prime(number)
             is_perfect = calculate_perfect(number)
             
@@ -107,7 +129,7 @@ class NumberClassificationSerializer(serializers.Serializer):
                 'number': int(instance),
                 'is_prime': False,
                 'is_perfect': False,
-                'properties': ['even'] if int(instance) % 2 == 0 else ['odd'],
+                'properties': ['odd'] if int(instance) % 2 else ['even'],
                 'digit_sum': 0,
                 'fun_fact': f"{instance} is a number"
             }
