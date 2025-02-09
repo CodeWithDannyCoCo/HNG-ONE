@@ -11,49 +11,41 @@ A REST API that takes a number and returns interesting mathematical properties a
 - Provides number properties (odd/even, armstrong)
 - Fetches fun facts about numbers from Numbers API
 
-## Quick Start
+## Base URL
 
-The easiest way to get started is to visit the root endpoint `/` which will provide you with the API information:
-
-```json
-{
-  "message": "Welcome to the Number Classification API",
-  "endpoint": "/api/classify-number",
-  "example": "/api/classify-number?number=371",
-  "documentation": "See README.md for more details"
-}
 ```
-
-This welcome message provides:
-
-- The main endpoint for number classification
-- A working example you can try
-- Reference to this documentation
+https://hng-one-iiyg.onrender.com
+```
 
 ## API Specification
 
 ### Endpoints
 
-#### 1. Root Endpoint (Welcome Page)
+#### 1. Root Endpoint
 
 ```
 GET /
 ```
 
-Returns basic API information and available endpoints. This is the best starting point for new users.
+Returns a simple welcome message.
 
 Response example:
 
 ```json
 {
-  "message": "Welcome to the Number Classification API",
-  "endpoint": "/api/classify-number",
-  "example": "/api/classify-number?number=371",
-  "documentation": "See README.md for more details"
+  "message": "Number Classification API"
 }
 ```
 
 #### 2. Number Classification Endpoint
+
+Base endpoint (for submission):
+
+```
+GET /api/classify-number
+```
+
+To use the API (with query parameter):
 
 ```
 GET /api/classify-number?number={number}
@@ -72,19 +64,52 @@ Success Response (200 OK):
   "is_perfect": false,
   "properties": ["armstrong", "odd"],
   "digit_sum": 11,
-  "fun_fact": "371 is an Armstrong number because 3^3 + 7^3 + 1^3 = 371"
+  "fun_fact": "371 is a narcissistic number"
 }
 ```
 
-Error Response (400 Bad Request):
+Error Responses:
+
+1. Missing Number Parameter (400 Bad Request):
 
 ```json
 {
-  "number": "alphabet",
+  "error": true,
+  "message": "Please provide a number parameter"
+}
+```
+
+2. Invalid Number Format (400 Bad Request):
+
+```json
+{
   "error": true,
   "message": "Invalid number format"
 }
 ```
+
+3. Server Error (500 Internal Server Error):
+
+```json
+{
+  "error": true,
+  "message": "Internal server error"
+}
+```
+
+## Important Note for Submission
+
+When submitting the API endpoint for evaluation, use only the base endpoint without query parameters:
+
+```
+https://hng-one-iiyg.onrender.com/api/classify-number
+```
+
+DO NOT include:
+
+- Query parameters (e.g., `?number=371`)
+- Trailing slashes
+- Additional paths
 
 ## Setup and Installation
 
@@ -99,15 +124,10 @@ Error Response (400 Bad Request):
    ```bash
    python manage.py migrate
    ```
-4. Collect static files:
-   ```bash
-   python manage.py collectstatic --noinput
-   ```
-5. Start the development server:
+4. Start the development server:
    ```bash
    python manage.py runserver
    ```
-6. Visit http://localhost:8000/ to see the welcome message
 
 ### Deployment on Render
 
@@ -117,7 +137,6 @@ Error Response (400 Bad Request):
    - Build Command: `./build.sh`
    - Start Command: `gunicorn one.wsgi:application`
 4. Deploy!
-5. Visit your deployed URL to see the welcome message
 
 ## Dependencies
 
@@ -126,7 +145,6 @@ Error Response (400 Bad Request):
 - django-cors-headers
 - requests
 - gunicorn (for production)
-- whitenoise (for static files)
 
 ## Features
 
@@ -136,8 +154,6 @@ Error Response (400 Bad Request):
 - Fast response time
 - RESTful API design
 - Production-ready configuration
-- Static file serving with whitenoise
-- Helpful welcome page with example endpoint
 
 ## Examples
 
@@ -162,8 +178,11 @@ GET /api/classify-number?number=28
 ## Testing the API
 
 1. Start with the root endpoint (`/`) to verify the API is running
-2. Use the example URL provided in the welcome message
-3. Try different numbers to explore various mathematical properties
+2. Test the number classification endpoint:
+   - Without parameters (should return 400)
+   - With invalid number (should return 400)
+   - With valid number (should return 200)
+3. Verify all responses match the specified formats above
 
 ## License
 

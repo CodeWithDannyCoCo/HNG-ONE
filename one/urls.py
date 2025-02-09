@@ -20,14 +20,11 @@ from django.http import JsonResponse
 
 def api_root(request):
     return JsonResponse({
-        "message": "Welcome to the Number Classification API",
-        "endpoint": "/api/classify-number",
-        "example": "/api/classify-number?number=371",
-        "documentation": "See README.md for more details"
+        "message": "Number Classification API"
     })
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
-    path('', api_root, name='api-root'),  # Add root URL view
+    path('', api_root, name='api-root'),
 ]
