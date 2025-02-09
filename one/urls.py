@@ -16,8 +16,18 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.http import JsonResponse
+
+def api_root(request):
+    return JsonResponse({
+        "message": "Welcome to the Number Classification API",
+        "endpoint": "/api/classify-number",
+        "example": "/api/classify-number?number=371",
+        "documentation": "See README.md for more details"
+    })
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
+    path('', api_root, name='api-root'),  # Add root URL view
 ]
