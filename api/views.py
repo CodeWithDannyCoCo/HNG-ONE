@@ -7,29 +7,31 @@ from .serializers import NumberClassificationSerializer
 
 @api_view(['GET'])
 def classify_number(request):
+    # Get number parameter from query string
+    number = request.GET.get('number')
+    
+    # Handle missing number parameter
+    if not number:
+        return Response({
+            "error": True,
+            "message": "Please provide a number parameter"
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Try to convert to integer
     try:
-        # Get number parameter from query string
-        number = request.GET.get('number')
-        if not number:
-            return Response({
-                "error": True,
-                "message": "Please provide a number parameter"
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Try to convert to integer
-        try:
-            number = int(number)
-        except ValueError:
-            return Response({
-                "error": True,
-                "message": "Invalid number format"
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
+        number = int(number)
+    except (ValueError, TypeError):
+        return Response({
+            "error": True,
+            "message": "Invalid number format"
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
         # Use serializer to process the number
         serializer = NumberClassificationSerializer(number)
         return Response(serializer.data, status=status.HTTP_200_OK)
-        
     except Exception as e:
+        # Log the error here if you have logging configured
         return Response({
             "error": True,
             "message": "Internal server error"
